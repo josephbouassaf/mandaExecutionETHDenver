@@ -1,6 +1,4 @@
 import Web3 from 'web3'
-import initContract from 'truffle-contract';
-
 let web3; 
 
 function handleAccountsChanged(accounts) {
