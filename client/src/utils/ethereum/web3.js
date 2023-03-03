@@ -1,4 +1,6 @@
 import Web3 from 'web3'
+import { ethers } from 'ethers';
+
 let web3; 
 
 function handleAccountsChanged(accounts) {
@@ -33,11 +35,22 @@ async function getUserAccount() {
    };;
 }
 
-if( typeof window !== 'undefined' && typeof window.ethereum !== 'undefined') {
+if(typeof window !== 'undefined' && typeof window.ethereum !== 'undefined') {
   web3 = new Web3(window.ethereum); // use the metamask provider
 } else { // fall back to infura if we are on the server or if the user doesn't have metamask
   const provider = new Web3.providers.HttpProvider("https://sepolia.infura.io/v3/9dca3d6945ad4cc4a18741bf02b4e44e");
   web3 = new Web3(provider); 
 }
 
-export {getUserAccount,web3}; 
+const getSigner = () => {
+const provider = new ethers.providers.Web3Provider(window.ethereum);
+const signer = provider.getSigner();
+return signer;
+}
+
+const getProvider = () => {
+  const provider = new ethers.providers.Web3Provider(window.ethereum);
+  return provider; 
+}
+
+export {getUserAccount,getSigner, getProvider,web3}; 
