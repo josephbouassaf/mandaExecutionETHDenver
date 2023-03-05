@@ -1,509 +1,139 @@
-import { web3,getUserAccount, getSigner, getProvider } from "./web3";
+import { 
+    web3,
+    getUserAccount, 
+    getSigner, 
+    getProvider 
+} from "./web3";
 import {ethers } from 'ethers'; 
-const abi = [
-    {
-    "inputs": [
-      {
-        "internalType": "string",
-        "name": "name",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "symbol",
-        "type": "string"
-      },
-      {
-        "internalType": "uint256",
-        "name": "initialSupply",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "constructor"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "owner",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "spender",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "value",
-        "type": "uint256"
-      }
-    ],
-    "name": "Approval",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "from",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "to",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "value",
-        "type": "uint256"
-      }
-    ],
-    "name": "Transfer",
-    "type": "event"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "owner",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "spender",
-        "type": "address"
-      }
-    ],
-    "name": "allowance",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "spender",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "approve",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "account",
-        "type": "address"
-      }
-    ],
-    "name": "balanceOf",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
-  },
-  {
-    "inputs": [],
-    "name": "decimals",
-    "outputs": [
-      {
-        "internalType": "uint8",
-        "name": "",
-        "type": "uint8"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "spender",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "subtractedValue",
-        "type": "uint256"
-      }
-    ],
-    "name": "decreaseAllowance",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "spender",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "addedValue",
-        "type": "uint256"
-      }
-    ],
-    "name": "increaseAllowance",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "name",
-    "outputs": [
-      {
-        "internalType": "string",
-        "name": "",
-        "type": "string"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
-  },
-  {
-    "inputs": [],
-    "name": "symbol",
-    "outputs": [
-      {
-        "internalType": "string",
-        "name": "",
-        "type": "string"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
-  },
-  {
-    "inputs": [],
-    "name": "totalSupply",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "to",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "transfer",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "from",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "to",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "transferFrom",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  }
-]; 
+import { INTUContractABI } from "./abi/INTUContractABI";
+import { 
+    getVaultByIndex, 
+    getIntuContract, 
+    signVaultEncryptionMessage 
+} from "./helpers/INTUHelpers";
 
-// ask about create conundrum
-// ask how to bind deoa to a wallet
-// ask how to send a transaction
-
-const getIntuContract = async () => {
-    //connect to INTU contract
-    const INTU_ADDRESS = 0x6c92E8018cF1284986B95A26d5666CA2bB8Aa9D7;    
-    //get abi
-    const INTUContractABI = await fetch('https://api.etherscan.io/api?module=contract&action=getabi&address=0xfb6916095ca1df60bb79ce92ce3ea74c37c5d359'); 
-    // get contract
-    const INTUContract = await new ethers.Contract(CONTRACT_ADDRESS, abi, getSigner());
-    return INTUContract; 
+/**************** Utility functions ******************/
+const registerUserInVault = async (userParisKey,vaultCount) => {
+    // get the contract
+    const INTUContract = getIntuContract();
+    // get the vault
+    const vault = await getVaultByIndex(vaultCount);
+    // register the user
+    await INTUContract.register(vault.vaultId, userParisKey);
+    console.log('user registered'); 
 }
 
-const createVault = async (participants,vaultName) => { // ask how to get public keys if to fenerate them we need vault
-    const INTUContract = await getIntuContract(); 
-    await INTUContract.create(participants, vaultName, [6,6,6], [participantsPublicKeysForVault], [2,2,2], "random"); 
-}
-
-const getVaultsInfo = async () => {
-        const INTUContract = await getIntuContract(); 
-        const alluservaults = await INTUContract.getUserVaults(getSigner());
-        let finalVaults = []; 
-        let signer = getSigner();
-
-        if (alluservaults.length > 0) {
-         for (let i = 0; i < alluservaults; i++) {
-         const data = await INTUContract.getVaultInfo(alluservaults[i], signer);
-         const registered = await INTUContract.userIsRegistered(alluservaults[i], signerAddress, signer);
-         const userPrivateKey = await INTUContract.userEncryptedPrivateForVaults(alluservaults[i], signerAddress, signer);
-         
-         const tempArray = {
-                            vaultName: data[0],
-                            vaultUsers: data[1],
-                            vaultCreated: data[2][1].toNumber(),
-                            //ethers.utils.computeAddress(data[3]),
-                            //vaultAddress: "0x12354",
-                            vaultAddress: data[3].length > 4 ? data[3] : "",
-                            vaultTxThreshold: data[4][0].toNumber(),
-                            vaultAdminThreshold: data[4][1].toNumber(),
-                            vaultRotationThreshold: data[4][2].toNumber(),
-                            vaultRegisteredUsers: data[5].toNumber(),
-                            vaultEncryptionMessage: data[6],
-                            vaultEthBalance: balanceInEth,
-                            userRegistered: registered,
-                            vaultId: data[2][0],
-                            vaultStatus: data[5].toNumber() >= data[1].length ? "ready" : "registration",
-                            txData: [],
-                            rotateData: [],
-                            adminChangeData: [],
-                            vaultNfts: [],
-                            encryptedShare: userPrivateKey,
-                        };
-         const txArray = (await INTUContract.getVaultTransactions(vaultId, state.signer)).map((tx) => tx.toNumber());
-                        for (let j = 0; j < txArray.length; j++) {
-                            let txId = txArray[j];
-                            const txInfo = await INTUContract.getTransactionInfo(txId, signer);
-                            console.warn(txInfo);
-                            const txdetails = ethers.utils.parseTransaction("0xe40380809470997970c51812dc3a010c7d01b50e0d17dc79c887038d7ea4c6800080018080");
-                            let txDataRetrieved = {
-                                chainId: txdetails.chainId,
-                                data: txdetails.data,
-                                gasLimit: txdetails.gasLimit ? Number(txdetails.gasLimit.toString()) : "",
-                                gasPrice: txdetails.gasPrice ? Number(txdetails.gasPrice.toString()) : "",
-                                maxFeePerGas: txdetails.maxFeePerGas ? Number(txdetails.maxFeePerGas.toString()) : "",
-                                maxPriorityFeePerGas: txdetails.maxPriorityFeePerGas ? Number(txdetails.maxPriorityFeePerGas.toString()) : "",
-                                to: txdetails.to,
-                                type: txdetails.type,
-                                value: ethers.utils.formatEther(txdetails.value.toString()),
-                                transactionIndex: txArray[i],
-                                transactionHash: txInfo[0],
-                                userTxSubmission: txInfo[1],
-                                txApprovedCount: Number(txInfo[2]),
-                                txSent: txInfo[3],
-                                vaultId: state.myVaults[i],
-                                transactionThreshold: tempArray.vaultTxThreshold,
-                                totalParticipants: tempArray.vaultUsers.length,
-                                txId: txArray[j],
-                                emptyTxData: txInfo[4],
-                            };
-                            tempArray.txData.push(txDataRetrieved);
-                        }
-         const getAdminChangeData = await INTUContract.getThresholdStatusForVault(vaultId, signer);
-                        if (getAdminChangeData) {
-                            let adminNamedArray = {
-                                newName: getAdminChangeData[0],
-                                newThreshold: getAdminChangeData[1],
-                                thresholdType: getAdminChangeData[2],
-                                readyToChangeThreshold: getAdminChangeData[3][0],
-                                readyToChangeName: getAdminChangeData[3][1],
-                                userVotedThreshold: getAdminChangeData[4][0],
-                                userVotedName: getAdminChangeData[4][1],
-                                votesForThreshold: getAdminChangeData[5][0],
-                                votesForName: getAdminChangeData[5][1],
-                                adminThreshold: getAdminChangeData[5][2],
-                            };
-                            tempArray.adminChangeData.push(adminNamedArray);
-                        }
-                        finalVaults.push(tempArray);
-        } 
-        // finalVaults has complete vault data for a user in an array, set it in your state.
-    }
-    return finalVaults;
-}
-
-
-const getVaultByName = async (name) => {
-    const vaults = async getVaultsInfo(); 
-    for(let i =0; i<vaults.length;i++) {
-        if(vaults[i].vaultName === name)
-            return vaults[i]; 
-    }
-}
-
-const signVaultEncryptionMessage = async (vaultName) => {
-    const INTUContract = await getIntuContract();
-    const signer = getSigner();  
-    let vault = await getVaultByName(vaultName);
-    let encryptionMessage = vault.vaultEncryptionMessage;
-    let signature = await signer.signMessage(encryptionMessage);
-    return signature; 
-}
-
-const getEncryptionKey = async (vaultId) => { // 1 for every user 
-     // This endpoint needs to be hit by each user involved with a vault during the vaults registration phase
-    const signature = await signVaultEncryptionMessage(vaultId); 
-    const userParisKey = await fetch('https://0feaswcvhk.execute-api.us-west-1.amazonaws.com/alpha/getencryptionkey',{
+const getEncryptionKey = async (signature) => { // 1 for every user 
+    // This endpoint needs to be hit by each user involved with a vault during the vaults registration phase
+    const userParisKey = await fetch('https://phk18up9uk.execute-api.us-west-1.amazonaws.com/beta/getencryptionkey',{
         method: 'POST',
+        cache: 'no-cache',
+        mode: 'cors',
         headers: {
-            // add API key
-            "Content-Type": 'application/json'
-        },
-        body: JSON.stringify({ "signature": signature })
-     }); 
-    const INTUContract = await getIntuContract(); 
-    //register user
-    await INTUContract.registerUser(vaultId, userParisKey); 
+           'X-API-Key': 'mggyHgqfVu6XrdN3hAhpm9nCV7NQ8gjQ5UrkOZ6X',
+           'Content-Type': 'application/json'
+       },
+       body: JSON.stringify({ "signature": signature })
+    }).then(response => response.json())
+    .then(data => data['userParisKey'])
+    console.log(userParisKey); 
+    return userParisKey; 
 }
-
-const generateMPCEOA = async (vaultName,participants) => { // 2
-    const INTUContract = await getIntuContract(); 
-    let vault = await getVaultByName(vaultName);
+// 1) call create vault 
+const createVault = async (participants,encryptionMessage,vaultName,vaultCount) => { 
+    const INTUContract = getIntuContract(); 
+    // sign the message by the signer
+    const signature = await signVaultEncryptionMessage(encryptionMessage);
+    // get encryption key
+    const userParisKey = await getEncryptionKey(signature); 
+    // create the vault
+    await INTUContract.create(participants, vaultName, [99,99,99], userParisKey, encryptionMessage); 
+    // register the caller
+    await registerUserInVault(userParisKey,vaultCount);
+}
+// 2) for every participant, add them to the vault (= generate pkey + register in vault)
+const addUserToVault = async (vaultIndex) => {
+    // get the vault 
+    let vault=  await getVaultByIndex(vaultIndex);
+    console.log(vault); 
+    // sign the encryption message
+    const signature = await signVaultEncryptionMessage(vault.vaultEncryptionMessage); 
+    // get encryption key
+    const userParisKey = await getEncryptionKey(signature); 
+    console.log(userParisKey);
+    // register user in vault
+    await registerUserInVault(userParisKey, vaultIndex); 
+} 
+// 3) generate the EOA, manda is the caller
+const generateMPCEOA = async (vaultIndex,participants) => { // 2 run that 
+    const CONTRACT_ADDRESS = '0x6c92E8018cF1284986B95A26d5666CA2bB8Aa9D7'; 
+    const INTUContract = new web3.eth.Contract(INTUContractABI,CONTRACT_ADDRESS); 
+    let vault = await getVaultByIndex(vaultIndex);
+    let vaultId = vault.vaultId;
+    console.log(vaultId); 
     let n = vault.vaultUsers; 
     let t = Math.ceil((n.length * vault.vaultTxThreshold) / 100)
     if (n.length === t) { t = n.length - 1 }
     let encryptionkeys = []; 
     for (let i = 0; i < vault.vaultUsers.length; i++) {
-      await INTUContract.userPublicKeyForEncryption(vault.vaultId, participants[i])
-        .then(res => {
-          encryptionkeys.push(res)
-        })
+      let key = await INTUContract.methods.userPublicKeyForEncryption(vaultId, participants[i]).call();
+      encryptionkeys.push(key); 
     }
-    let dataToSend = JSON.stringify({ "participants": n, "threshold": t, "encryptionkeys": encryptionkeys })
-    fetch('http://localhost:8080/keygen', {
-      headers: {
-        'Content-Type': 'text/plain'
-      },
-      mode: 'cors',
-      referrerPolicy: 'no-referrer',
-      cache: 'no-cache',
-      method: 'POST',
-      body: dataToSend
-      //add api key
+    let encryptedShares; 
+    let masterPublicKey; 
+    await fetch('https://phk18up9uk.execute-api.us-west-1.amazonaws.com/beta/keygen', {
+        method: 'POST',
+        cache: 'no-cache',
+        mode: 'cors',
+        headers: {
+           "Content-Type": 'application/json',
+           "X-API-Key": "mggyHgqfVu6XrdN3hAhpm9nCV7NQ8gjQ5UrkOZ6X"
+       },
+       body: JSON.stringify({ "participants": n, "threshold": t, "encryptionkeys": encryptionkeys })
     })
       .then(res => res.json())
       .then(res => {
-        let encryptedShares = res.keys.replace('[', '');
+        console.log(res); 
+        encryptedShares = res.keys.replace('[', '');
         encryptedShares = encryptedShares.replace(']', '');
         encryptedShares = encryptedShares.split(' ');
         masterPublicKey = res.eoa;
-        INTUContract.userCompleteVault(vaultId, encryptedShares, masterPublicKey)
-      })
+        console.log('the eoa address is '+res.eoa); 
+      });
+      await  INTUContract.userCompleteVault(vaultId, encryptedShares, masterPublicKey);
+      return masterPublicKey; 
 }
-// ask how to do
 
 const formTransaction = async (vaultName,to) => {
-    // get the intu contract
-    const INTUContract = await getIntuContract(); 
+    // get the contract
+    if(INTUContract === undefined)
+        INTUContract = await getIntuContract();
     // get provider
-    const provider = getProvider(); 
-    const signer = getSigner(); 
+    const provider = getProvider();  
     // get the vaultId
     let vault= await getVaultByName(vaultName); 
     let nonce = provider.getTransactionCount(vault.vaultAddress);
     let noncePlusTx = nonce + vault.txData.length;
     //let userPrivateKey = await INTUContract.userEncryptedPrivateForVaults(vault.vaultId, signer);
     //let signature = await INTUContract.signMessage(vault.vaultEncryptionMessage); // what is this
-    let value = ethers.utils.parseEther(String(0))._hex;
+    let value = ethers.utils.parseEther(String(value))._hex;
     let finalValue = parseInt(value).toString();
     let chainId = 11155111;
     let data = {
     nonce: noncePlusTx,
     toaddress: to,
     value: finalValue,
-    data: "", // check this
+    //data: "", // check this
     chainid: chainId
     }
-    let body: JSON.stringify({ data })
-    const result = await fetch('https://0feaswcvhk.execute-api.us-west-1.amazonaws.com/alpha/formtransaction',{
+    const result = await fetch('https://phk18up9uk.execute-api.us-west-1.amazonaws.com/beta/formtransaction',{
         method: 'POST',
+        cache: 'no-cache',
+        mode: 'cors',
         headers: {
-            // add API key
-            "Content-Type": 'application/json'
-        },
+           'X-API-Key': 'mggyHgqfVu6XrdN3hAhpm9nCV7NQ8gjQ5UrkOZ6X',
+           'Content-Type': 'application/json'
+       },
         body: JSON.stringify({ data})
      }); 
 
@@ -568,4 +198,4 @@ const combineSignatures = async (vaultId) => {
 }
 
 
-export {abi, getIntuContract,signVaultEncryptionMessage,getEncryptionKey,generateMPCEOA}; 
+export {getEncryptionKey,generateMPCEOA,createVault, addUserToVault}; 

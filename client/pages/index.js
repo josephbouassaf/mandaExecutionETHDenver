@@ -5,7 +5,7 @@ import Navbar from '../src/components/Navbar';
 
 export default () => {
   return (
-    <div>
+    <div className="all">
       <Navbar/>
       <Main/>
     </div>
